@@ -1,7 +1,9 @@
 package com.example.viccamerawarning
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -10,6 +12,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
@@ -29,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.viccamerawarning.data.repository.CameraRepository
 import com.example.viccamerawarning.location.DefaultLocationTracker
@@ -58,7 +62,6 @@ class MainActivity : ComponentActivity() {
         viewModel = CameraViewModel(
             repo = CameraRepository(),
             tracker = DefaultLocationTracker(this),
-            speaker = SpeechService(this),
         )
 
         setContent {
@@ -77,12 +80,26 @@ class MainActivity : ComponentActivity() {
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }}
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
 
-            // UI is irrelevant — alerts run in background
-//        setContent {
-//            MainScreen(viewModel)
-//        }
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    1001
+                )
+            }
+        }
 
+
+        // Start the foreground service
+        val intent = Intent(this, SpeedCameraService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
+        } else {
+            startService(intent)
+        }
 
     }
 }
@@ -110,7 +127,9 @@ fun VicCameraWarningApp(viewModel: CameraViewModel) {
         }
     ) {
         Scaffold(modifier = Modifier.fillMaxSize()
-            .windowInsetsPadding(WindowInsets.safeDrawing)) { innerPadding ->
+            .windowInsetsPadding(WindowInsets.safeDrawing)) {
+            innerPadding ->
+            Modifier.padding(innerPadding)
 //            Greeting(
 //                name = "Android",
 //                modifier = Modifier.padding(innerPadding)

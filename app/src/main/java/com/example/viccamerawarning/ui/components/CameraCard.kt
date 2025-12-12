@@ -23,9 +23,9 @@ fun CameraCard(nearestCamera: CameraLocation?, userLocation: Location?, cameraLi
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
-            Log.d("CameraCard", "Current Cameras: $cameraList")
-            Log.d("CameraCard", "Nearest Camera: $nearestCamera")
-            Log.d("CameraCard", "Current Location: $userLocation")
+//            Log.d("CameraCard", "Current Cameras: $cameraList")
+//            Log.d("CameraCard", "Nearest Camera: $nearestCamera")
+//            Log.d("CameraCard", "Current Location: $userLocation")
             if (nearestCamera == null || userLocation == null || cameraList == emptyList<CameraLocation>()) {
                 Text("No camera detected")
                 return@Column

@@ -1,7 +1,10 @@
 package com.example.viccamerawarning.data.repository
 
 import com.example.viccamerawarning.data.remote.RetrofitInstance
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class CameraRepository {
+@Singleton
+class CameraRepository @Inject constructor() {
     suspend fun getCameras() = RetrofitInstance.api.getCameras()
 }
